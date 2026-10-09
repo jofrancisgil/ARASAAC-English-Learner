@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E1F0FA"/>
+      <stop offset="50%" stop-color="#E8E5F8"/>
+      <stop offset="100%" stop-color="#E0F2E9"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#4A5568" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- App Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  
+  <!-- Safe Zone Frame -->
+  <g filter="url(#soft-shadow)">
+    <!-- Main Card -->
+    <rect x="76" y="76" width="360" height="360" rx="48" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="6"/>
+    
+    <!-- ARASAAC / Pictogram grid mockup -->
+    <!-- Top-left: School (Pencil/Book - Pastel Amber) -->
+    <rect x="108" y="108" width="136" height="136" rx="28" fill="#FEF3C7" stroke="#FDE68A" stroke-width="4"/>
+    <path d="M152 208 L176 148 L200 208 Z" fill="#F59E0B"/>
+    <circle cx="176" cy="180" r="16" fill="#FBBF24"/>
+    
+    <!-- Top-right: Family/Emotion (Happy Heart/Smile - Pastel Rose) -->
+    <rect x="268" y="108" width="136" height="136" rx="28" fill="#FCE7F3" stroke="#FBCFE8" stroke-width="4"/>
+    <circle cx="336" cy="166" r="32" fill="#F472B6"/>
+    <circle cx="326" cy="160" r="4" fill="#FFFFFF"/>
+    <circle cx="346" cy="160" r="4" fill="#FFFFFF"/>
+    <path d="M326 176 Q336 186 346 176" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+    
+    <!-- Bottom-left: Weather (Sun - Pastel Sky) -->
+    <rect x="108" y="268" width="136" height="136" rx="28" fill="#E0F2FE" stroke="#BAE6FD" stroke-width="4"/>
+    <circle cx="176" cy="336" r="28" fill="#38BDF8"/>
+    <circle cx="176" cy="336" r="18" fill="#FDE047"/>
+    
+    <!-- Bottom-right: Speech / English AAC (Pastel Mint) -->
+    <rect x="268" y="268" width="136" height="136" rx="28" fill="#DCFCE7" stroke="#BBF7D0" stroke-width="4"/>
+    <path d="M310 320 C310 306 324 296 340 296 C356 296 370 306 370 320 C370 330 362 338 350 342 L352 356 L338 344 C322 344 310 334 310 320 Z" fill="#34D399"/>
+  </g>
+</svg>

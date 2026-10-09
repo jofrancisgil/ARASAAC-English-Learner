@@ -1,0 +1,6 @@
+{
+  "name": "ARASAAC SEN English Learner",
+  "description": "An intuitive English vocabulary learning and AAC app for Special Educational Needs (SNE) students featuring official ARASAAC pictograms, semantic categories, speech audio, educator progress tracking, printable PDF reports, and Google Sheets integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

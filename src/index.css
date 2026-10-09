@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Lexend', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+  }
+}
+
+.font-fredoka {
+  font-family: 'Fredoka', 'Lexend', system-ui, sans-serif;
+}
+
+/* Print Styles for crisp PDF generation */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  header,
+  nav,
+  button,
+  .no-print,
+  .fixed:not(#printable-report-area) {
+    display: none !important;
+  }
+
+  #printable-report-area {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: auto;
+  }
+}
