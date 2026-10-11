@@ -9,6 +9,10 @@ const STORAGE_KEYS = {
   CUSTOM_VOCAB: 'arasaac_sen_custom_vocab_v2',
   CUSTOM_CATEGORIES: 'arasaac_sen_custom_categories_v2',
   APP_SETTINGS: 'arasaac_sen_settings_v2',
+  PASSCODE_HASH: 'arasaac_sen_passcode_hash_v1',
+  PASSCODE_ENABLED: 'arasaac_sen_passcode_enabled_v1',
+  PASSCODE_HINT: 'arasaac_sen_passcode_hint_v1',
+  SESSION_UNLOCKED: 'arasaac_sen_unlocked_session_v1',
 };
 
 export interface AppSettings {
@@ -359,3 +363,85 @@ export const importAllDataJSON = (jsonString: string): boolean => {
     return false;
   }
 };
+
+// --- Passcode / Privacy Access Lock Helpers ---
+export const isPasscodeEnabled = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(STORAGE_KEYS.PASSCODE_ENABLED) === 'true';
+};
+
+export const getPasscodeHash = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(STORAGE_KEYS.PASSCODE_HASH);
+};
+
+export const getPasscodeHint = (): string => {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem(STORAGE_KEYS.PASSCODE_HINT) || '';
+};
+
+// Fast hashing for client-side privacy barrier
+export const simpleHash = (text: string): string => {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return 'ph_' + Math.abs(hash).toString(36) + '_' + text.length;
+};
+
+export const setAppPasscode = (passcode: string, hint?: string) => {
+  if (typeof window === 'undefined') return;
+  if (!passcode) {
+    localStorage.removeItem(STORAGE_KEYS.PASSCODE_HASH);
+    localStorage.removeItem(STORAGE_KEYS.PASSCODE_ENABLED);
+    localStorage.removeItem(STORAGE_KEYS.PASSCODE_HINT);
+    localStorage.removeItem(STORAGE_KEYS.SESSION_UNLOCKED);
+    sessionStorage.removeItem(STORAGE_KEYS.SESSION_UNLOCKED);
+  } else {
+    const hash = simpleHash(passcode);
+    localStorage.setItem(STORAGE_KEYS.PASSCODE_HASH, hash);
+    localStorage.setItem(STORAGE_KEYS.PASSCODE_ENABLED, 'true');
+    if (hint) {
+      localStorage.setItem(STORAGE_KEYS.PASSCODE_HINT, hint);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.PASSCODE_HINT);
+    }
+    // Automatically set current session as unlocked when setting or changing passcode
+    setSessionUnlocked(true);
+  }
+};
+
+export const removeAppPasscode = () => {
+  setAppPasscode('');
+};
+
+export const verifyAppPasscode = (input: string): boolean => {
+  const storedHash = getPasscodeHash();
+  if (!storedHash) return true;
+  return simpleHash(input) === storedHash;
+};
+
+export const isSessionUnlocked = (): boolean => {
+  if (typeof window === 'undefined') return true;
+  if (!isPasscodeEnabled()) return true;
+  return (
+    sessionStorage.getItem(STORAGE_KEYS.SESSION_UNLOCKED) === 'true' ||
+    localStorage.getItem(STORAGE_KEYS.SESSION_UNLOCKED) === 'true'
+  );
+};
+
+export const setSessionUnlocked = (unlocked: boolean, rememberOnDevice = true) => {
+  if (typeof window === 'undefined') return;
+  if (unlocked) {
+    sessionStorage.setItem(STORAGE_KEYS.SESSION_UNLOCKED, 'true');
+    if (rememberOnDevice) {
+      localStorage.setItem(STORAGE_KEYS.SESSION_UNLOCKED, 'true');
+    }
+  } else {
+    sessionStorage.removeItem(STORAGE_KEYS.SESSION_UNLOCKED);
+    localStorage.removeItem(STORAGE_KEYS.SESSION_UNLOCKED);
+  }
+};
+

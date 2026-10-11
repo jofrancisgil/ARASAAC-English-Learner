@@ -10,6 +10,7 @@ import {
   Settings,
   Users,
   UserPlus,
+  Lock,
 } from 'lucide-react';
 
 export type AppNavMode = 'board' | 'activities' | 'dashboard';
@@ -24,6 +25,8 @@ interface HeaderProps {
   onOpenExportModal: () => void;
   onOpenSearchModal: () => void;
   onOpenSettingsModal: () => void;
+  onLockApp: () => void;
+  isPasscodeConfigured: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,6 +39,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenExportModal,
   onOpenSearchModal,
   onOpenSettingsModal,
+  onLockApp,
+  isPasscodeConfigured,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs">
@@ -179,10 +184,21 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenSettingsModal}
             className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
-            title="Audio speed & sensory settings"
+            title="Audio speed, sensory settings & passcode"
           >
             <Settings className="w-4 h-4" />
           </button>
+
+          {/* Quick Lock / Privacy Button */}
+          {isPasscodeConfigured && (
+            <button
+              onClick={onLockApp}
+              className="p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition"
+              title="Lock app now (require passcode to enter)"
+            >
+              <Lock className="w-4 h-4" />
+            </button>
+          )}
 
           <div className="hidden md:block">
             <PWAInstallButton />

@@ -1,14 +1,22 @@
-import React from 'react';
-import { AppSettings } from '../utils/storage';
+import React, { useState } from 'react';
+import {
+  AppSettings,
+  isPasscodeEnabled,
+  getPasscodeHint,
+  setAppPasscode,
+  removeAppPasscode,
+  setSessionUnlocked,
+} from '../utils/storage';
 import { StudentProfile } from '../types';
 import { speakText } from '../utils/speech';
-import { X, Volume2, ShieldCheck, Moon, Sun, Type } from 'lucide-react';
+import { X, Volume2, ShieldCheck, Moon, Sun, Type, Lock, KeyRound } from 'lucide-react';
 
 interface SettingsModalProps {
   settings: AppSettings;
   onUpdateSettings: (newSettings: AppSettings) => void;
   activeStudent: StudentProfile;
   onUpdateStudent: (updated: StudentProfile) => void;
+  onLockApp: () => void;
   onClose: () => void;
 }
 
@@ -17,10 +25,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onUpdateSettings,
   activeStudent,
   onUpdateStudent,
+  onLockApp,
   onClose,
 }) => {
+  const [passcodeActive, setPasscodeActive] = useState(isPasscodeEnabled());
+  const [isEditingPasscode, setIsEditingPasscode] = useState(false);
+  const [newPasscode, setNewPasscode] = useState('');
+  const [passcodeHint, setPasscodeHint] = useState(getPasscodeHint());
+
   const handleTestSpeech = (rate: number) => {
     speakText('Hello! This is English speech audio.', { rate });
+  };
+
+  const handleSavePasscode = () => {
+    if (newPasscode.trim().length < 4) {
+      alert('Passcode must have at least 4 characters');
+      return;
+    }
+    setAppPasscode(newPasscode.trim(), passcodeHint.trim());
+    setPasscodeActive(true);
+    setIsEditingPasscode(false);
+    setNewPasscode('');
+  };
+
+  const handleRemovePasscode = () => {
+    if (confirm('Are you sure you want to remove passcode protection? The app will be open without a lock.')) {
+      removeAppPasscode();
+      setPasscodeActive(false);
+      setIsEditingPasscode(false);
+      setNewPasscode('');
+      setPasscodeHint('');
+    }
+  };
+
+  const handleLockNow = () => {
+    setSessionUnlocked(false);
+    onClose();
+    onLockApp();
   };
 
   return (
@@ -126,6 +167,90 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               }
               className="w-4 h-4 rounded text-teal-600 focus:ring-teal-400"
             />
+          </div>
+
+          {/* Privacy Passcode Management */}
+          <div className="pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-slate-700 block">
+                🔒 Privacy Passcode Protection
+              </span>
+              {passcodeActive ? (
+                <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  Active
+                </span>
+              ) : (
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                  Not Set
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-slate-500 mb-3">
+              Lock the website so unauthorized visitors cannot see your student profiles or AAC boards.
+            </p>
+
+            {isEditingPasscode ? (
+              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
+                <input
+                  type="password"
+                  placeholder="New passcode (min 4 characters)"
+                  value={newPasscode}
+                  onChange={(e) => setNewPasscode(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-teal-500"
+                />
+                <input
+                  type="text"
+                  placeholder="Password hint (optional)"
+                  value={passcodeHint}
+                  onChange={(e) => setPasscodeHint(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSavePasscode}
+                    className="flex-1 py-1.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition"
+                  >
+                    Save Passcode
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingPasscode(false)}
+                    className="py-1.5 px-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingPasscode(true)}
+                  className="px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold transition"
+                >
+                  {passcodeActive ? 'Change Passcode' : 'Set Passcode Now'}
+                </button>
+                {passcodeActive && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleLockNow}
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                    >
+                      Lock App Now
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRemovePasscode}
+                      className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition"
+                    >
+                      Remove Lock
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Offline Notice */}

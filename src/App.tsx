@@ -30,10 +30,14 @@ import {
   saveAppSettings,
   calculateStudentProgress,
   AppSettings,
+  isPasscodeEnabled,
+  isSessionUnlocked,
+  setSessionUnlocked,
 } from './utils/storage';
 import { speakText } from './utils/speech';
 
 import { Header, AppNavMode } from './components/Header';
+import { PasscodeLockScreen } from './components/PasscodeLockScreen';
 import { StudentBoardView } from './components/StudentBoardView';
 import { FlashcardModal } from './components/FlashcardModal';
 import { EducatorDashboard } from './components/EducatorDashboard';
@@ -77,6 +81,9 @@ export default function App() {
   const [sentenceItems, setSentenceItems] = useState<VocabularyItem[]>([]);
   const [activeFlashcard, setActiveFlashcard] = useState<VocabularyItem | null>(null);
   const [flashcardIndex, setFlashcardIndex] = useState(0);
+
+  // App Privacy Lock state
+  const [isLocked, setIsLocked] = useState<boolean>(() => !isSessionUnlocked());
 
   // Modals state
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -203,8 +210,24 @@ export default function App() {
     setVocabularyList(getAllVocabulary());
   };
 
+  const isPasscodeSet = isPasscodeEnabled();
+
+  const handleLockApp = () => {
+    setSessionUnlocked(false);
+    setIsLocked(true);
+  };
+
+  const handleUnlockApp = () => {
+    setIsLocked(false);
+  };
+
   return (
     <div className={`min-h-screen bg-slate-50 flex flex-col ${settings.sensoryCalmMode ? 'contrast-95' : ''}`}>
+      {/* Privacy Lock Screen Overlay */}
+      {isLocked && isPasscodeSet && (
+        <PasscodeLockScreen onUnlocked={handleUnlockApp} />
+      )}
+
       {/* App Header */}
       <Header
         currentMode={currentMode}
@@ -221,6 +244,8 @@ export default function App() {
         onOpenExportModal={() => handleOpenExportWithTemplate('iep-progress')}
         onOpenSearchModal={() => setIsSearchModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
+        onLockApp={handleLockApp}
+        isPasscodeConfigured={isPasscodeSet}
       />
 
       {/* Main Workspace */}
@@ -575,6 +600,7 @@ export default function App() {
           onUpdateSettings={handleUpdateSettings}
           activeStudent={activeStudent}
           onUpdateStudent={handleUpdateStudent}
+          onLockApp={handleLockApp}
           onClose={() => setIsSettingsModalOpen(false)}
         />
       )}
