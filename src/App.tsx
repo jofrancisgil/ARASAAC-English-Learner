@@ -594,7 +594,7 @@ export default function App() {
       )}
 
       {/* MODAL: Settings & Audio Controls */}
-      {isSettingsModalOpen && activeStudent && (
+      {isSettingsModalOpen && (
         <SettingsModal
           settings={settings}
           onUpdateSettings={handleUpdateSettings}
